@@ -6,7 +6,11 @@ from vocabulary import Vocabulary
 
 class MockCorpusParams:
 	def __init__(self, knownWords, unknownWords):
-		return
+		self.knownWords = knownWords
+		self.unknownWords = unknownWords
+
+	def words(self):
+		return list(self.knownWords) + list(self.unknownWords)
 
 def generateWord():
 	MIN_WORD_LENGTH = 3
@@ -29,5 +33,8 @@ class TestVocabulary(unittest.TestCase):
 		print(knownWords)
 		params = MockCorpusParams(knownWords, unknownWords)
 		v = Vocabulary(params)
-		vocabularyEstimate = v.calculate()
+		questions = v.getQuestions()
+		for q in questions:
+			q.setAnswer(q.word in knownWords)
+		vocabularyEstimate = v.calculate(questions)
 		self.assertEquals(vocabularyEstimate, 1000)
