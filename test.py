@@ -1,10 +1,11 @@
+import matplotlib.pyplot as plt
 import random
 import string
 import unittest
 
 from vocabulary import Vocabulary
 
-class MockCorpusParams:
+class MockCorpora:
 	def __init__(self, knownWords, unknownWords):
 		self.knownWords = knownWords
 		self.unknownWords = unknownWords
@@ -26,15 +27,21 @@ def generateUniqueWords(n, ruleOut=[]):
 			result.add(newWord)
 	return result
 
+def measurement(knownWords, unknownWords):
+	corpora = MockCorpora(knownWords, unknownWords)
+	v = Vocabulary(corpora)
+	questions = v.getQuestions()
+	for q in questions:
+		q.setAnswer(q.word in knownWords)
+	return v.calculate(questions)
+
 class TestVocabulary(unittest.TestCase):
 	def test(self):
 		knownWords = generateUniqueWords(1000)
 		unknownWords = generateUniqueWords(3000, ruleOut=knownWords)
-		print(knownWords)
-		params = MockCorpusParams(knownWords, unknownWords)
-		v = Vocabulary(params)
-		questions = v.getQuestions()
-		for q in questions:
-			q.setAnswer(q.word in knownWords)
-		vocabularyEstimate = v.calculate(questions)
-		self.assertEquals(vocabularyEstimate, 1000)
+		distribution = [measurement(knownWords, unknownWords) for _ in range(1000)]
+		plt.hist(distribution)
+		plt.show()
+		lower, upper = measurement(knownWords, unknownWords)
+		self.assertLessEqual(lower, 1000)
+		self.assertLessEqual(1000, upper)
