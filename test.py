@@ -37,11 +37,15 @@ def measurement(knownWords, unknownWords):
 
 class TestVocabulary(unittest.TestCase):
 	def test(self):
-		knownWords = generateUniqueWords(1000)
-		unknownWords = generateUniqueWords(3000, ruleOut=knownWords)
-		distribution = [measurement(knownWords, unknownWords) for _ in range(1000)]
-		plt.hist(distribution)
-		plt.show()
+		N_KNOWN = 10000
+		knownWords = generateUniqueWords(N_KNOWN)
+		unknownWords = generateUniqueWords(50000, ruleOut=knownWords)
+#		ciDistribution = [measurement(knownWords, unknownWords) for _ in range(1000)]
+#		distribution = [(l + u) / 2 for l, u in ciDistribution]
+#		plt.hist(distribution)
+#		plt.show()
 		lower, upper = measurement(knownWords, unknownWords)
-		self.assertLessEqual(lower, 1000)
-		self.assertLessEqual(1000, upper)
+		print(lower, upper)
+		self.assertLessEqual(lower, N_KNOWN)
+		self.assertLessEqual(N_KNOWN, upper)
+		self.assertLessEqual((upper - lower) / 2, 0.1 * N_KNOWN)

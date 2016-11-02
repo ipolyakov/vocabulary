@@ -20,7 +20,7 @@ class Vocabulary:
 		self.__corpora = corpora
 
 	def __sample(self):
-		N_QUESTIONS = 500
+		N_QUESTIONS = 50
 		# Strictly sampling should be with replacements, but for simplicity we
 		# try to leave it without
 		return random.sample(self.__corpora.words(), N_QUESTIONS)
@@ -33,7 +33,6 @@ class Vocabulary:
 	def calculate(self, questionsNAnswers):
 		if None in [q.answer() for q in questionsNAnswers]:
 			raise ValueError()
-		CONFIDENCE_LEVEL = 0.95
 		sample = [1. if q.answer() else 0. for q in questionsNAnswers]
 		percentageCI = bootstrap.ci(data=sample, statfunction=scipy.mean)
 		return [b * len(self.__corpora.words()) for b in percentageCI]
