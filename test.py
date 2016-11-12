@@ -8,33 +8,24 @@ from wordfreq import top_n_list
 from vocabulary import Vocabulary
 
 class MockCorpora:
-	def __init__(self, knownWords, unknownWords):
-		self.knownWords = knownWords
-		self.unknownWords = unknownWords
+	def __init__(self, nWords):
+		self.__nWords = nWords
 
 	def words(self):
-		return list(self.knownWords) + list(self.unknownWords)
+		return top_n_list('en', self.__nWords, wordlist='large')
 
 	def frequencyClasses(self):
-		
+		return [0] * self.__nWords
 
-def generateWord():
-	MIN_WORD_LENGTH = 3
-	MAX_WORD_LENGTH = 7
-	length = random.randint(MIN_WORD_LENGTH, MAX_WORD_LENGTH)
-	return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
-
-def generateUniqueWords(n):
-	result = set()
-	while len(result) < n:
-		result.add(generateWord())
-	return result
-
-def measurement(knownWords, unknownWords):
-	corpora = MockCorpora(knownWords, unknownWords)
+def measurement(nKnownWords, nUnknownWords):
+	corpora = MockCorpora(nKnownWords + nUnknownWords)
+	# say if one knows every 4th word in the entire vocabulary
+	# that means if word1 appears twice more frequent that word2 in corpora
+	# then probability of one knowing it should be twice higher as well
 	v = Vocabulary(corpora)
 	questions = v.getQuestions()
 	for q in questions:
+		# TODO: how to specify which words do I know
 		q.setAnswer(q.word in knownWords)
 	return v.calculate(questions)
 
@@ -47,9 +38,7 @@ def plot():
 class TestVocabulary(unittest.TestCase):
 	def test(self):
 		N_KNOWN = 10000
-		allWords = generateUniqueWords(N_KNOWN + 40000)
-		knownWords, unknownWords = allWords[:10000], allWords[10000:]
-		lower, upper = measurement(knownWords, unknownWords)
+		lower, upper = measurement(N_KNOWN, 40000)
 		print(lower, upper)
 		self.assertLessEqual(lower, N_KNOWN)
 		self.assertLessEqual(N_KNOWN, upper)

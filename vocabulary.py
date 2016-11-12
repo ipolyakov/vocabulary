@@ -26,7 +26,7 @@ class Vocabulary:
 		return random.sample(self.__corpora.words(), n)
 
 	def __stratifiedSample(self, n):
-		sss = StratifiedShuffleSplit(n_splits=1, test_size=0, train_size=n)
+		sss = StratifiedShuffleSplit(n_splits=1, test_size=None, train_size=n)
 		words, = tuple(sss.split(self.__corpora.words(), self.__corpora.frequencyClasses()))
 		return words
 
