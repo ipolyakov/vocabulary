@@ -3,6 +3,8 @@ import random
 import string
 import unittest
 
+from wordfreq import top_n_list
+
 from vocabulary import Vocabulary
 
 class MockCorpora:
@@ -13,18 +15,19 @@ class MockCorpora:
 	def words(self):
 		return list(self.knownWords) + list(self.unknownWords)
 
+	def frequencyClasses(self):
+		
+
 def generateWord():
 	MIN_WORD_LENGTH = 3
 	MAX_WORD_LENGTH = 7
 	length = random.randint(MIN_WORD_LENGTH, MAX_WORD_LENGTH)
 	return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
 
-def generateUniqueWords(n, ruleOut=[]):
+def generateUniqueWords(n):
 	result = set()
 	while len(result) < n:
-		newWord = generateWord()
-		if not newWord in ruleOut:
-			result.add(newWord)
+		result.add(generateWord())
 	return result
 
 def measurement(knownWords, unknownWords):
@@ -35,15 +38,17 @@ def measurement(knownWords, unknownWords):
 		q.setAnswer(q.word in knownWords)
 	return v.calculate(questions)
 
+def plot():
+	ciDistribution = [measurement(knownWords, unknownWords) for _ in range(1000)]
+	distribution = [(l + u) / 2 for l, u in ciDistribution]
+	plt.hist(distribution)
+	plt.show()
+
 class TestVocabulary(unittest.TestCase):
 	def test(self):
 		N_KNOWN = 10000
-		knownWords = generateUniqueWords(N_KNOWN)
-		unknownWords = generateUniqueWords(50000, ruleOut=knownWords)
-#		ciDistribution = [measurement(knownWords, unknownWords) for _ in range(1000)]
-#		distribution = [(l + u) / 2 for l, u in ciDistribution]
-#		plt.hist(distribution)
-#		plt.show()
+		allWords = generateUniqueWords(N_KNOWN + 40000)
+		knownWords, unknownWords = allWords[:10000], allWords[10000:]
 		lower, upper = measurement(knownWords, unknownWords)
 		print(lower, upper)
 		self.assertLessEqual(lower, N_KNOWN)

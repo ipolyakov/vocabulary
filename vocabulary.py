@@ -1,6 +1,7 @@
 import random
 import scikits.bootstrap as bootstrap
 import scipy
+from sklearn.model_selection import StratifiedShuffleSplit
 
 class Question:
 	def __init__(self, word):
@@ -19,11 +20,19 @@ class Vocabulary:
 	def __init__(self, corpora):
 		self.__corpora = corpora
 
-	def __sample(self):
-		N_QUESTIONS = 50
+	def __simpleRandomSample(self, n):	
 		# Strictly sampling should be with replacements, but for simplicity we
 		# try to leave it without
-		return random.sample(self.__corpora.words(), N_QUESTIONS)
+		return random.sample(self.__corpora.words(), n)
+
+	def __stratifiedSample(self, n):
+		sss = StratifiedShuffleSplit(n_splits=1, test_size=0, train_size=n)
+		words, = tuple(sss.split(self.__corpora.words(), self.__corpora.frequencyClasses()))
+		return words
+
+	def __sample(self):
+		N_QUESTIONS = 50
+		return self.__stratifiedSample(N_QUESTIONS)
 
 	def getQuestions(self):
 		return [Question(word) for word in self.__sample()]
