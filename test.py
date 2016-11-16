@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy
 import random
 import string
+import sys
 import unittest
 
 from wordfreq import top_n_list, word_frequency
@@ -12,7 +13,7 @@ class MockCorpora:
 	def __init__(self, nWords):
 		self.__nWords = nWords
 		self.__words = top_n_list('en', self.__nWords, wordlist='large')
-		print(str(self.__words))
+#		sys.stdout.buffer.write(str(self.__words).encode('utf-8'))
 		self.__frequencies = numpy.array([word_frequency(w, 'en') for w in self.__words])
 
 	def words(self):

@@ -1,6 +1,7 @@
 import random
 import scikits.bootstrap as bootstrap
 import scipy
+import sys
 from sklearn.model_selection import StratifiedShuffleSplit
 
 class Question:
@@ -27,8 +28,9 @@ class Vocabulary:
 
 	def __stratifiedSample(self, n):
 		sss = StratifiedShuffleSplit(n_splits=1, test_size=None, train_size=n)
-		words, = tuple(sss.split(self.__corpora.words(), self.__corpora.frequencyClasses()))
-		return words
+		# TODO: not eaasily readable [0][0] writing - may be rewrite with detupling
+		words_indicies = tuple(sss.split(self.__corpora.words(), self.__corpora.frequencyClasses()))[0][0]
+		return [self.__corpora.words()[i] for i in words_indicies]
 
 	def __sample(self):
 		N_QUESTIONS = 50
@@ -43,5 +45,6 @@ class Vocabulary:
 		if None in [q.answer() for q in questionsNAnswers]:
 			raise ValueError()
 		sample = [1. if q.answer() else 0. for q in questionsNAnswers]
+		print(sample)
 		percentageCI = bootstrap.ci(data=sample, statfunction=scipy.mean)
 		return [b * len(self.__corpora.words()) for b in percentageCI]
