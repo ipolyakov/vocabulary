@@ -45,6 +45,8 @@ class Vocabulary:
 		if None in [q.answer() for q in questionsNAnswers]:
 			raise ValueError()
 		sample = [1. if q.answer() else 0. for q in questionsNAnswers]
+		if sample == [0.] * len(questionsNAnswers): # bootstrap fails if we pass all zeroes
+			return [0., 0.]
 		print(sample)
 		percentageCI = bootstrap.ci(data=sample, statfunction=scipy.mean)
 		return [b * len(self.__corpora.words()) for b in percentageCI]
